@@ -9,6 +9,7 @@ import subprocess
 import os
 import time
 
+
 class OSDetails:
 	
 	def __init__(self):
@@ -22,20 +23,45 @@ class OSDetails:
 
 	def getDetails(self):
 		try : 
-			#Uses command : uname -a
+			#Uses command : uname 
 			#type : uname --help 
-			filein = subprocess.call("uname -a >osdetails" , shell = True , stdout = subprocess.PIPE)
-			file = open("osdetails","r")
-			details = file.read()
-			parsed_details = details.rsplit()
-			self.kernel_name += parsed_details[0]
-			self.node_hostname += parsed_details[1]
-			self.kernel_release += parsed_details[2]
-			self.machine_hardware += parsed_details[11]
-			self.processor += parsed_details[12]
-			self.hardware_platform += parsed_details[13]
-			self.operating_system += parsed_details[14]
-			file.close()
+			filein = subprocess.call("uname -s >OSdetails", shell = True , stdout = subprocess.PIPE)
+			file = open("OSdetails","r+")
+			self.kernel_name = file.read()
+ 			file.close()
+ 			filein = subprocess.call("uname -n >OSdetails", shell = True , stdout = subprocess.PIPE)
+			file = open("OSdetails","r+")
+			self.node_hostname = file.read()
+ 			file.close()
+ 			filein = subprocess.call("uname -r >OSdetails", shell = True , stdout = subprocess.PIPE)
+			file = open("OSdetails","r+")
+			self.kernel_release = file.read()
+ 			file.close()
+ 			filein = subprocess.call("uname -m >OSdetails", shell = True , stdout = subprocess.PIPE)
+			file = open("OSdetails","r+")
+			self.machine_hardware = file.read()
+ 			file.close()
+ 			filein = subprocess.call("uname -p >OSdetails", shell = True , stdout = subprocess.PIPE)
+			file = open("OSdetails","r+")
+			self.processor = file.read()
+ 			file.close()
+ 			filein = subprocess.call("uname -i >OSdetails", shell = True , stdout = subprocess.PIPE)
+			file = open("OSdetails","r+")
+			self.hardware_platform = file.read()
+ 			file.close()
+ 			filein = subprocess.call("uname -o >OSdetails", shell = True , stdout = subprocess.PIPE)
+			file = open("OSdetails","r+")
+			self.operating_system = file.read()
+ 			file.close()
+ 			file = open("OSdetails","w")
+ 			file.write(self.kernel_name)
+ 			file.write(self.node_hostname)
+ 			file.write(self.kernel_release)
+ 			file.write(self.machine_hardware)
+ 			file.write(self.processor)
+ 			file.write(self.hardware_platform)
+ 			file.write(self.operating_system)
+ 			file.close()
 		except :
 			print("ERROR occured while gathering OS details")
 		return
@@ -196,24 +222,27 @@ class NetworkDetails:
 			tmp = tmp + 1
 
 
-try :
+OS = OSDetails()
+ram = RAMDetails()
+cpu = CPUDetails()
+net = NetworkDetails()
+hdd = DiskDetails()
+OS.getDetails()
+print OS.node_hostname
+
+
+"""try :
 	cd = os.getcwd()
-	cd = cd + "/userfiles"
-	if not os.path.exists(cd) :
-		subprocess.call("mkdir userfiles",shell = True)
-	os.chdir(cd)
-	os = OSDetails()
-	ram = RAMDetails()
-	cpu = CPUDetails()
-	net = NetworkDetails()
-	hdd = DiskDetails()
-	while True :
-		os.getDetails()
-		ram.getDetails()
-		cpu.getDetails()
-		net.getDetails()
-		hdd.getDetails()
-		print("check")	
-		time.sleep(10)
+	tmp = cd + "/CINMan"
+	print(tmp)
+	if not os.path.exists(tmp) :
+		subprocess.call("mkdir CINMan",shell = True)
+	
+	os.chdir(tmp)
+	os.getDetails()
+	ram.getDetails()
+	cpu.getDetails()
+	net.getDetails()
+	hdd.getDetails()
 except :
-	print("ERROR")
+	print("ERROR")"""
