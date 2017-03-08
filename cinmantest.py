@@ -176,11 +176,11 @@ class DiskDetails:
 
 	def getDetails(self):
 		try :
-			filein = subprocess.call("df -h >diskdetails", shell = True , stdout = subprocess.PIPE)
+			filein = subprocess.call("df -h --total >diskdetails", shell = True , stdout = subprocess.PIPE)
 			file = open("diskdetails","r")
 			details = file.read()
-			tmp = details.find("/dev/sda2")
-			tmp = tmp + len("/dev/sda2") 
+			tmp = details.find("total")
+			tmp = tmp + len("total") 
 			while (details[tmp] == " "):
 				tmp = tmp + 1
 			while (details[tmp] != " "):
@@ -227,8 +227,8 @@ ram = RAMDetails()
 cpu = CPUDetails()
 net = NetworkDetails()
 hdd = DiskDetails()
-OS.getDetails()
-print OS.node_hostname
+hdd.getDetails()
+print hdd.avail
 
 
 """try :
