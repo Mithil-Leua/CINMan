@@ -207,7 +207,7 @@ class NetworkDetails:
 		self.mac_addr = ""
 
 	def getDetails(self):
-		filein = subprocess.call("ifconfig eth0 >networkdetails",shell = True , stdout = subprocess.PIPE)
+		filein = subprocess.call("/sbin/ifconfig eth0 >networkdetails",shell = True , stdout = subprocess.PIPE)
 		file = open("networkdetails","r")
 		details = file.read()
 		tmp = details.find("inet addr")
@@ -227,8 +227,6 @@ ram = RAMDetails()
 cpu = CPUDetails()
 net = NetworkDetails()
 hdd = DiskDetails()
-hdd.getDetails()
-print hdd.avail
 
 
 """try :
