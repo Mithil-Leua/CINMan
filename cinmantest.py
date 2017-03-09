@@ -8,6 +8,7 @@
 import subprocess
 import os
 import time
+import simplejson
 
 
 class OSDetails:
@@ -66,6 +67,10 @@ class OSDetails:
 			print("ERROR occured while gathering OS details")
 		return
 
+	def getDictionary(self):
+		tmpdict = {"kernel name" : self.kernel_name , "node hostname" : self.node_hostname , "kernel release" : self.kernel_release , "machine hardware" : self.machine_hardware , "processor" : self.processor , "hardware platform" : self.hardware_platform, "operating system" : self.operating_system}
+		return tmpdict
+
 class RAMDetails:
 
 	def __init__(self):
@@ -97,7 +102,11 @@ class RAMDetails:
 			file.close()
 		except :
 			print("ERROR occured while gathering RAM details")
-		return 		
+		return
+
+	def getDictionary(self):
+		tmpdict = {"total memory" :self.mem_total , "available memory" : self.mem_available}
+		return tmpdict 		
 
 class CPUDetails :
 
@@ -107,7 +116,7 @@ class CPUDetails :
 		self.cpu_speed = ""
 		self.cache_size = ""
 		self.processors = ""
-		self.cores_per_process = ""
+		self.cores_per_processor = ""
 
 	def getDetails(self):
 		try : 
@@ -160,12 +169,16 @@ class CPUDetails :
 			while (details[tmp] == " "):
 				tmp = tmp + 1
 			while (details[tmp] != '\n'):
-				self.cores_per_process += details[tmp]
+				self.cores_per_processor += details[tmp]
 				tmp = tmp + 1
 			file.close()
 		except :
 			print("ERROR occured while getting CPU details")
 		return
+
+	def getDictionary(self) :
+		tmpdict = {"vendor id" : self.vendor_id , "model name" : self.model_name , "cpu speed" : self.cpu_speed , "cache size" : self.cache_size , "processors" : self.processors , "cores per processor" : self.cores_per_processor}
+		return tmpdict
 
 class DiskDetails:
 
@@ -199,6 +212,11 @@ class DiskDetails:
 			file.close()
 		except :
 			print("Error occured while gathering disk details")
+		return 
+
+	def getDictionary(self):
+		tmpdict = {"size" : self.size , "used" : self.used , "available" : self.avail}
+		return tmpdict
 
 class NetworkDetails:
 
@@ -207,40 +225,74 @@ class NetworkDetails:
 		self.mac_addr = ""
 
 	def getDetails(self):
-		filein = subprocess.call("/sbin/ifconfig eth0 >networkdetails",shell = True , stdout = subprocess.PIPE)
-		file = open("networkdetails","r")
-		details = file.read()
-		tmp = details.find("inet addr")
-		tmp = tmp + len("inet addr") + 1
-		while(details[tmp] != " ") :
-			self.ip_addr += details[tmp]
-			tmp = tmp + 1
-		tmp = details.find("HWaddr")
-		tmp = tmp + len("HWaddr") + 1
-		while(details[tmp] != " ") :
-			self.mac_addr += details[tmp]
-			tmp = tmp + 1
+		try :
+			filein = subprocess.call("/sbin/ifconfig eth0 >networkdetails",shell = True , stdout = subprocess.PIPE)
+			file = open("networkdetails","r")
+			details = file.read()
+			tmp = details.find("inet addr")
+			tmp = tmp + len("inet addr") + 1
+			while(details[tmp] != " ") :
+				self.ip_addr += details[tmp]
+				tmp = tmp + 1
+			tmp = details.find("HWaddr")
+			tmp = tmp + len("HWaddr") + 1
+			while(details[tmp] != " ") :
+				self.mac_addr += details[tmp]
+				tmp = tmp + 1
+		except :
+			print("Error occured while gathering Network details")
+		return 
 
+	def getDictionary(self):
+		tmpdict = {"ip addr" : self.ip_addr, "mac addr" : self.mac_addr}
+		return tmpdict 
+
+
+class userDetails:
+
+	def __init__(self):
+		self.user_list = []
+
+	def getDetails(self):
+		try :
+			filein = subprocess.call("who -q >userdetails",shell = True , stdout = subprocess.PIPE)
+			file = open("userdetails","r")
+			details = file.read()
+			parsed_details = details.split(" ")
+			for i in range(0,len(parsed_details)-1) :
+				self.user_list.append(parsed_details[i])
+		except :
+			print("Error occured while gathering user details")
+		return 
+
+	def getDictionary(self):
+		tmpdict = {"user list" : self.user_list}
+		return tmpdict
 
 OS = OSDetails()
 ram = RAMDetails()
 cpu = CPUDetails()
 net = NetworkDetails()
 hdd = DiskDetails()
+user = userDetails()
 
+OS.getDetails()
+ram.getDetails()
+cpu.getDetails()
+net.getDetails()
+hdd.getDetails()
+user.getDetails()
 
-"""try :
-	cd = os.getcwd()
-	tmp = cd + "/CINMan"
-	print(tmp)
-	if not os.path.exists(tmp) :
-		subprocess.call("mkdir CINMan",shell = True)
-	
-	os.chdir(tmp)
-	os.getDetails()
-	ram.getDetails()
-	cpu.getDetails()
-	net.getDetails()
-	hdd.getDetails()
-except :
-	print("ERROR")"""
+client_data = []
+
+#collecting data in dictionary form and then appending all of them to create a list of dictionary
+client_data.append(OS.getDictionary())
+client_data.append(ram.getDictionary())
+client_data.append(cpu.getDictionary())
+client_data.append(net.getDictionary())
+client_data.append(hdd.getDictionary())
+client_data.append(user.getDictionary())
+
+#serializing the client data using simple json
+
+client_data = simplejson.dumps(client_data)
