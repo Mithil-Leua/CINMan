@@ -217,7 +217,21 @@ class DiskDetails:
 	def getDictionary(self):
 		tmpdict = {"size" : self.size , "used" : self.used , "available" : self.avail}
 		return tmpdict
-
+class SotwareDetails:
+	def __init__(self):
+		self.allsoft=[]
+	def getDetails(self):
+		command="apt list --installed"
+		filein = subprocess.call("apt list --installed > Details", shell = True , stdout = subprocess.PIPE)
+		#file = open("OSdetails","r+")
+		m=[]
+		with open("details") as f:
+		    for line in f:
+			m.append(str(line))
+		for x in m:
+			self.allsoft.append(x[:x.find("/")])
+	
+	
 class NetworkDetails:
 
 	def __init__(self) :
