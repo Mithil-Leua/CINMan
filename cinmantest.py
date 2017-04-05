@@ -218,8 +218,15 @@ class DiskDetails:
 		tmpdict = {"size" : self.size , "used" : self.used , "available" : self.avail}
 		return tmpdict
 class SotwareDetails:
+	def find_between( s, first, last ):
+	    try:
+		start = s.index( first ) + len( first )
+		end = s.index( last, start )
+		return s[start:end]
+	    except ValueError:
+		return ""
 	def __init__(self):
-		self.allsoft=[]
+		self.allsoft={}
 	def getDetails(self):
 		command="apt list --installed"
 		filein = subprocess.call("apt list --installed > Details", shell = True , stdout = subprocess.PIPE)
@@ -229,7 +236,8 @@ class SotwareDetails:
 		    for line in f:
 			m.append(str(line))
 		for x in m:
-			self.allsoft.append(x[:x.find("/")])
+			self.allsoft[[x[:x.find("/")]]=find_between(x," "," ")
+		del self.allsoft["Listing..."]		     
 	
 	
 class NetworkDetails:
